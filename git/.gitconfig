@@ -3,3 +3,5 @@
 	email = nkalauni@arizona.edu
 [core]
 	editor = vi
+[init]
+	defaultBranch = main
