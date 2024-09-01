@@ -110,3 +110,6 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+#
+# Use jj to exit normal mode in zsh shell
+bindkey -M viins 'jj' vi-cmd-mode 
