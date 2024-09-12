@@ -25,6 +25,9 @@
 ;;inhibit starting window
 (setq inhibit-startup-message t)
 
+;; Mac switch control to command
+(setq mac-command-modifier 'control)
+
 (scroll-bar-mode -1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
@@ -88,17 +91,17 @@
 (setq use-package-always-ensure t)
 
 ;; Quelpa stuff
-(unless (package-installed-p 'quelpa)
-  (with-temp-buffer
-    (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
-    (eval-buffer)
-    (quelpa-self-upgrade)))
-
-(quelpa
- '(quelpa-use-package
-   :fetcher git
-   :url "https://github.com/quelpa/quelpa-use-package.git"))
-(require 'quelpa-use-package)
+;; (unless (package-installed-p 'quelpa)
+;;   (with-temp-buffer
+;;     (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
+;;     (eval-buffer)
+;;     (quelpa-self-upgrade)))
+;; 
+;; (quelpa
+;;  '(quelpa-use-package
+;;    :fetcher git
+;;    :url "https://github.com/quelpa/quelpa-use-package.git"))
+;; (require 'quelpa-use-package)
 
 (use-package try
   :ensure t)
@@ -214,6 +217,9 @@
   :config
   (require 'org-roam-dailies) ;; Ensure the keymap is available
   (org-roam-db-autosync-mode))
+
+;;Org-ref stuff
+(use-package org-ref)
 
 ;; Load org-faces to make sure we can set appropriate faces
 (require 'org-faces)
@@ -412,46 +418,46 @@
   :ensure t)
 
 ;; Julia stuff
-(use-package julia-mode
-  :ensure t)
-
-(use-package julia-repl
-  :ensure t
-  :hook (julia-mode . julia-repl-mode)
-
-  :init
-  (setenv "JULIA_NUM_THREADS" "8")
-
-  :config
-  ;; Set the terminal backend
-  (julia-repl-set-terminal-backend 'vterm)
-  
-  ;; Keybindings for quickly sending code to the REPL
-  (define-key julia-repl-mode-map (kbd "<C-RET>") 'my/julia-repl-send-cell)
-  (define-key julia-repl-mode-map (kbd "<M-RET>") 'julia-repl-send-line)
-  (define-key julia-repl-mode-map (kbd "<S-return>") 'julia-repl-send-buffer))
-
-(quelpa '(lsp-julia :fetcher github
-                    :repo "gdkrmr/lsp-julia"
-                    :files (:defaults "languageserver")))
-
-(use-package lsp-julia
-  :config
-  (setq lsp-julia-default-environment "~/.julia/environments/v1.9"))
-
-(add-hook 'julia-mode-hook #'lsp-mode)
-
-(defun my/julia-repl-send-cell() 
-  ;; "Send the current julia cell (delimited by ###) to the julia shell"
-  (interactive)
-  (save-excursion (setq cell-begin (if (re-search-backward "^###" nil t) (point) (point-min))))
-  (save-excursion (setq cell-end (if (re-search-forward "^###" nil t) (point) (point-max))))
-  (set-mark cell-begin)
-  (goto-char cell-end)
-  (julia-repl-send-region-or-line)
-  (next-line))
-
-(evil-add-command-properties #'my/julia-repl-send-cell :jump t)
+;; (use-package julia-mode
+;;   :ensure t)
+;; 
+;; (use-package julia-repl
+;;   :ensure t
+;;   :hook (julia-mode . julia-repl-mode)
+;; 
+;;   :init
+;;   (setenv "JULIA_NUM_THREADS" "8")
+;; 
+;;   :config
+;;   ;; Set the terminal backend
+;;   (julia-repl-set-terminal-backend 'vterm)
+;;   
+;;   ;; Keybindings for quickly sending code to the REPL
+;;   (define-key julia-repl-mode-map (kbd "<C-RET>") 'my/julia-repl-send-cell)
+;;   (define-key julia-repl-mode-map (kbd "<M-RET>") 'julia-repl-send-line)
+;;   (define-key julia-repl-mode-map (kbd "<S-return>") 'julia-repl-send-buffer))
+;; 
+;; (quelpa '(lsp-julia :fetcher github
+;;                     :repo "gdkrmr/lsp-julia"
+;;                     :files (:defaults "languageserver")))
+;; 
+;; (use-package lsp-julia
+;;   :config
+;;   (setq lsp-julia-default-environment "~/.julia/environments/v1.9"))
+;; 
+;; (add-hook 'julia-mode-hook #'lsp-mode)
+;; 
+;; (defun my/julia-repl-send-cell() 
+;;   ;; "Send the current julia cell (delimited by ###) to the julia shell"
+;;   (interactive)
+;;   (save-excursion (setq cell-begin (if (re-search-backward "^###" nil t) (point) (point-min))))
+;;   (save-excursion (setq cell-end (if (re-search-forward "^###" nil t) (point) (point-max))))
+;;   (set-mark cell-begin)
+;;   (goto-char cell-end)
+;;   (julia-repl-send-region-or-line)
+;;   (next-line))
+;; 
+;; (evil-add-command-properties #'my/julia-repl-send-cell :jump t)
 
 (use-package emojify
   :ensure t
