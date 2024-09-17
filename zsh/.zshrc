@@ -78,7 +78,7 @@ eval "$(pyenv init --path)"
 eval "$(pyenv virtualenv-init -)"
 
 # List the plugins to be loaded
-plugins=(git vi-mode pyenv brew python autojump)
+plugins=(git vi-mode conda-env brew python autojump)
 
 source $ZSH/oh-my-zsh.sh
 
