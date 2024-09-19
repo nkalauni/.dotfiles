@@ -110,6 +110,10 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+alias oco="ssh ocotillo"
+alias dot="cd ~/.dotfiles"
+alias jl="jupyter lab"
+alias jlr="jupyter lab --no-browser --port=4444
 #
 # Use jj to exit normal mode in zsh shell
 bindkey -M viins 'jj' vi-cmd-mode 
