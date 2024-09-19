@@ -78,7 +78,7 @@ ZSH_THEME="jonathan"
 # eval "$(pyenv virtualenv-init -)"
 
 # List the plugins to be loaded
-plugins=(git vi-mode conda-env brew python autojump)
+plugins=(git git-auto-fetch vi-mode conda-env brew python autojump)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -113,7 +113,7 @@ source $ZSH/oh-my-zsh.sh
 alias oco="ssh ocotillo"
 alias dot="cd ~/.dotfiles"
 alias jl="jupyter lab"
-alias jlr="jupyter lab --no-browser --port=4444
+alias jlr="jupyter lab --no-browser --port=4444"
 #
 # Use jj to exit normal mode in zsh shell
 bindkey -M viins 'jj' vi-cmd-mode 
