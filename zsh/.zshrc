@@ -72,10 +72,10 @@ ZSH_THEME="jonathan"
 # Add wisely, as too many plugins slow down shell startup.
 
 #Follwing code needed for pyenv plugin
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init --path)"
-eval "$(pyenv virtualenv-init -)"
+# export PYENV_ROOT="$HOME/.pyenv"
+# export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init --path)"
+# eval "$(pyenv virtualenv-init -)"
 
 # List the plugins to be loaded
 plugins=(git vi-mode conda-env brew python autojump)
