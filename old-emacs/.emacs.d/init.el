@@ -9,7 +9,7 @@
    '(:foreground default :background default :scale 2.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
 		 ("begin" "$1" "$" "$$" "\\(" "\\[")))
  '(package-selected-packages
-   '(mood-line emojify undo-tree counsel ivy-rich ivy projectile doom-modeline lsp-julia lsp-mode lv markdown-mode ht f julia-repl julia-mode vterm evil doom-themes org-roam auctex whole-line-or-region helm ace-window org-bullets which-key try use-package))
+   '(org-ref mood-line emojify undo-tree counsel ivy-rich ivy projectile doom-modeline lsp-julia lsp-mode lv markdown-mode ht f julia-repl julia-mode vterm evil doom-themes org-roam auctex whole-line-or-region helm ace-window org-bullets which-key try use-package))
  '(sentence-end-double-space nil)
  '(tab-bar-show nil))
 (custom-set-faces
@@ -48,7 +48,7 @@
 ;; Backup file settings
 (defvar --backup-directory (concat user-emacs-directory "backups"))
 (if (not (file-exists-p --backup-directory))
-        (make-directory --backup-directory t))
+    (make-directory --backup-directory t))
 (setq backup-directory-alist `(("." . ,--backup-directory)))
 (setq make-backup-files t               ; backup of a file the first time it is saved.
       backup-by-copying t               ; don't clobber symlinks
@@ -67,7 +67,7 @@
   (message "Emacs loaded in %s with %d garbage collections."
            (format "%.2f seconds"
                    (float-time
-                   (time-subtract after-init-time before-init-time)))
+                    (time-subtract after-init-time before-init-time)))
            gcs-done))
 
 (add-hook 'emacs-startup-hook #'efs/display-startup-time)
@@ -83,7 +83,7 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-  ;; Initialize use-package on non-Linux platforms
+;; Initialize use-package on non-Linux platforms
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
@@ -144,7 +144,7 @@
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   ;; example how to map a command in normal mode (called 'normal state' in evil)
   (define-key evil-normal-state-map (kbd ", w") 'evil-window-vsplit))
-  ;;(define-key evil-normal-state-map (kbd ", h") 'evil-window-hsplit))
+;;(define-key evil-normal-state-map (kbd ", h") 'evil-window-hsplit))
 
 (use-package evil-nerd-commenter
   :ensure t
@@ -186,9 +186,12 @@
   :ensure t
   :init
   (setq org-roam-v2-ack t)
+
   :custom
   (org-roam-directory "~/roam-notes")
+
   (org-roam-completion-everywhere t)
+
   (org-roam-capture-templates
    '(("d" "default" plain
       "%?"
@@ -200,10 +203,13 @@
      ("p" "paper-summaries" plain (file "~/roam-notes/templates/paper.org")
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+latexpreview\n")
       :unnarrowed t)))
+
   (org-roam-dailies-directory "journal/")
+
   (org-roam-dailies-capture-templates
-    '(("d" "default" entry "* %<%I:%M %p>: %?"
-       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+   '(("d" "default" entry "* %<%I:%M %p>: %?"
+      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
@@ -212,10 +218,68 @@
          :map org-roam-dailies-map
          ("Y" . org-roam-dailies-capture-yesterday)
          ("T" . org-roam-dailies-capture-tomorrow))
+
   :bind-keymap
   ("C-c n d" . org-roam-dailies-map)
+
   :config
   (require 'org-roam-dailies) ;; Ensure the keymap is available
+
+  ;; https://github.com/Vidianos-Giannitsis/Dotfiles/blob/master/emacs/.emacs.d/libs/zettelkasten.org
+
+  (cl-defmethod org-roam-node-directories ((node org-roam-node))
+    "Access slot \"directory\" of org-roam-node struct CL-X"
+    (if-let ((dirs (file-name-directory (file-relative-name (org-roam-node-file node) org-roam-directory))))
+	(format "(%s)" (car (f-split dirs)))
+      ""))
+
+  (cl-defmethod org-roam-node-backlinkscount ((node org-roam-node))
+    "Access slot \"backlinks\" of org-roam-node struct CL-X"
+    (let* ((count (caar (org-roam-db-query
+			 [:select (funcall count source)
+				  :from links
+				  :where (= dest $s1)
+				  :and (= type "id")]
+			 (org-roam-node-id node)))))
+      (format "[%d]" count)))
+
+  (cl-defmethod org-roam-node-backlinkscount-number ((node org-roam-node))
+    "Access slot \"backlinks\" of org-roam-node struct CL-X. This
+     is identical to `org-roam-node-backlinkscount' with the
+     difference that it returns a number instead of a formatted
+     string. This is to be used in
+     `org-roam-node-sort-by-backlinks'"
+    (let* ((count (caar (org-roam-db-query
+			 [:select (funcall count source)
+				  :from links
+				  :where (= dest $s1)
+				  :and (= type "id")]
+			 (org-roam-node-id node)))))
+      count))
+
+  (cl-defmethod org-roam-node-todostate ((node org-roam-node))
+    "Modified version of org-roam-node-todo to look a bit better"
+    (if-let ((state (org-roam-node-todo node)))
+	(format "Status: %s" state)))
+
+  (cl-defmethod org-roam-node-buffer ((node org-roam-node))
+    "Access slot \"buffer\" of org-roam-node struct CL-X"
+    (let ((buffer (get-file-buffer (org-roam-node-file node))))
+      buffer))
+
+  ;; (setq org-roam-node-display-template "${title:115} ${backlinkscount:6} ${todostate:20} ${directories:10} ${tags:15}")
+
+  ;; (setq org-roam-node-display-template
+  ;;     (concat "${title:*} "
+  ;;             (propertize "${tags:10}" 'face 'org-tag)))
+
+  (add-to-list 'display-buffer-alist
+	        '("\\*org-roam\\*"
+		  (display-buffer-in-direction)
+		  (direction . right)
+		  (window-width . 0.40)
+		  (window-height . fit-window-to-buffer)))
+
   (org-roam-db-autosync-mode))
 
 ;;Org-ref stuff
@@ -297,9 +361,9 @@
   :after lsp-mode
   :hook (prog-mode . company-mode)
   :bind (:map company-active-map
-         ("<tab>" . company-complete-selection))
-        (:map lsp-mode-map
-         ("<tab>" . company-indent-or-complete-common))
+              ("<tab>" . company-complete-selection))
+  (:map lsp-mode-map
+        ("<tab>" . company-indent-or-complete-common))
   :custom
   (company-minimum-prefix-length 1)
   (company-idle-delay 0.0))
@@ -322,7 +386,7 @@
 
 ;; Rebind window switching
 (global-set-key (kbd "M-o") 'other-window)
-;(windmove-default-keybindings)
+					;(windmove-default-keybindings)
 
 ;; Change overlap when scrolling
 (setq next-screen-context-lines 5)
@@ -364,22 +428,26 @@
 ;; (setq modus-themes-paren-match '(bold intense))
 
 ;; (setq modus-themes-headings
-      ;; '((1 . (rainbow overline background 1.4))
-        ;; (2 . (rainbow background 1.3))
-        ;; (3 . (rainbow bold 1.2))
-        ;; (t . (semilight 1.1))))
+;; '((1 . (rainbow overline background 1.4))
+;; (2 . (rainbow background 1.3))
+;; (3 . (rainbow bold 1.2))
+;; (t . (semilight 1.1))))
 
 ;; Important!
 ;; (setq modus-themes-scale-headings t)
 
 ;; (setq modus-themes-org-blocks 'gray-background)
-;(setq modus-themes-org-blocks 'tinted-background)
+					;(setq modus-themes-org-blocks 'tinted-background)
 
 ;; (load-theme 'modus-vivendi t)		
 
 ;; Doom theme configs
 ;; Doom modeline
-(use-package all-the-icons
+;; (use-package all-the-icons
+;;   :ensure t)
+
+;; Run `nerd-icons-install-fonts' if fonts are not showing in modeline
+(use-package nerd-icons
   :ensure t)
 
 (use-package doom-modeline
