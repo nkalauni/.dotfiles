@@ -115,6 +115,12 @@ alias dot="cd ~/.dotfiles"
 alias jl="jupyter lab"
 alias jlr="jupyter lab --no-browser --port=4444"
 alias track="cd ~/Documents/productivity;conda activate vanilla;python ~/Documents/productivity/progress-tracker.py"
+
+# Tmux aliases
+alias tn='tmux new -s'                      # Create new session with name
+alias ta='tmux attach -t'                   # Attach to existing session
+alias tl='tmux ls'                          # List all sessions
+alias tk='tmux kill-session -t'             # Kill specific session
 #
 # Use jj to exit normal mode in zsh shell
 bindkey -M viins 'jj' vi-cmd-mode 
