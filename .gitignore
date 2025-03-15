@@ -61,3 +61,4 @@ site-lisp/package/
 /projects
 /forge-*.sqlite
 /projectile.cache
+.DS_Store

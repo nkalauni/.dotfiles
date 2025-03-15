@@ -114,6 +114,7 @@ alias oco="ssh ocotillo"
 alias dot="cd ~/.dotfiles"
 alias jl="jupyter lab"
 alias jlr="jupyter lab --no-browser --port=4444"
+alias track="cd ~/Documents/productivity;conda activate vanilla;python ~/Documents/productivity/progress-tracker.py"
 #
 # Use jj to exit normal mode in zsh shell
 bindkey -M viins 'jj' vi-cmd-mode 
@@ -133,3 +134,12 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+path=('/Users/nkalauni/.juliaup/bin' $path)
+export PATH
+
+# <<< juliaup initialize <<<
