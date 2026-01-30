@@ -62,3 +62,5 @@ site-lisp/package/
 /forge-*.sqlite
 /projectile.cache
 .DS_Store
+.secrets
+.netrwhist
